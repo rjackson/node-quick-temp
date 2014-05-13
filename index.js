@@ -9,7 +9,7 @@ function makeOrRemake(obj, prop) {
   if (obj[prop] != null) {
     remove(obj, prop)
   }
-  return obj[prop] = makeTmpDir(obj, prop)
+  return obj[prop] = makeTmpDir(obj.constructor && obj.constructor.name || '', prop)
 }
 
 exports.makeOrReuse = makeOrReuse
@@ -17,7 +17,7 @@ function makeOrReuse(obj, prop) {
   if (obj[prop] != null) {
     return obj[prop]
   }
-  return obj[prop] = makeTmpDir(obj, prop)
+  return obj[prop] = makeTmpDir(obj.constructor && obj.constructor.name || '', prop)
 }
 
 exports.remove = remove
@@ -29,9 +29,9 @@ function remove(obj, prop) {
 }
 
 
-function makeTmpDir(obj, prop) {
+function makeTmpDir(name, prop) {
   findBaseDir()
-  var tmpDirName = prettyTmpDirName(obj, prop)
+  var tmpDirName = prettyTmpDirName(name, prop)
   return mktemp.createDirSync(path.join(baseDir, tmpDirName))
 }
 
@@ -53,14 +53,14 @@ function findBaseDir () {
   }
 }
 
-function prettyTmpDirName (obj, prop) {
+function prettyTmpDirName (name, prop) {
   function cleanString (s) {
     return underscoreString.underscored(s || '')
       .replace(/[^a-z_]/g, '')
       .replace(/^_+/, '')
   }
 
-  var cleanObjectName = cleanString(obj.constructor && obj.constructor.name)
+  var cleanObjectName = cleanString(name)
   if (cleanObjectName === 'object') cleanObjectName = ''
   if (cleanObjectName) cleanObjectName += '-'
   var cleanPropertyName = cleanString(prop)
